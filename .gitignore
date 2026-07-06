@@ -1,0 +1,26 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# VS Code settings (optional)
+.vscode/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Dataset folders
+raw_data/
+data/
+
+# Model outputs
+models/
+checkpoints/
+
+# Logs
+*.log

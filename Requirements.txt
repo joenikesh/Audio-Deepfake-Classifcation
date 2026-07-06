@@ -1,0 +1,22 @@
+# Deep Learning
+torch
+torchaudio
+
+# Audio Processing
+librosa
+soundfile
+
+# Numerical Computing
+numpy
+
+# Machine Learning Utilities
+scikit-learn
+
+# Progress Bars
+tqdm
+
+# Visualization
+matplotlib
+
+# Data Handling
+pandas
