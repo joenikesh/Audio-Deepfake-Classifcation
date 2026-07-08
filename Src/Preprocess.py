@@ -2,25 +2,17 @@ from pathlib import Path
 import numpy as np
 import librosa
 
-
-
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
 DATA_DIR = PROJECT_ROOT / "data"
-REAL_DIR = DATA_DIR / "real"
-FAKE_DIR = DATA_DIR / "fake"
 OUTPUT_DIR = DATA_DIR / "processed"
-
-
-
 
 SAMPLE_RATE = 16000
 DURATION = 8
 N_MFCC = 40
+N_FFT = 2048
+HOP_LENGTH = 512
 
 MAX_SAMPLES = SAMPLE_RATE * DURATION
-
-
 
 
 def load_audio(file_path):
@@ -42,25 +34,59 @@ def extract_mfcc(audio):
     mfcc = librosa.feature.mfcc(
         y=audio,
         sr=SAMPLE_RATE,
-        n_mfcc=N_MFCC
+        n_mfcc=N_MFCC,
+        n_fft=N_FFT,
+        hop_length=HOP_LENGTH
     )
 
     return mfcc
 
 
+def extract_pitch(audio):
+    pitches, magnitudes = librosa.piptrack(
+        y=audio,
+        sr=SAMPLE_RATE,
+        n_fft=N_FFT,
+        hop_length=HOP_LENGTH
+    )
+
+    pitch_values = []
+
+    for frame in range(pitches.shape[1]):
+        index = magnitudes[:, frame].argmax()
+        pitch = pitches[index, frame]
+        pitch_values.append(pitch)
+
+    return np.array(pitch_values)
+
+
+def extract_energy(audio):
+    energy = librosa.feature.rms(
+        y=audio,
+        frame_length=N_FFT,
+        hop_length=HOP_LENGTH
+    )
+
+    return energy[0]
+
+
 def preprocess_file(file_path):
     audio = load_audio(file_path)
     audio = fix_audio_length(audio)
+
     mfcc = extract_mfcc(audio)
+    pitch = extract_pitch(audio)
+    energy = extract_energy(audio)
 
-    return mfcc
-
+    return mfcc, pitch, energy
 
 
 def preprocess_dataset():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    X = []
+    X_mfcc = []
+    X_pitch = []
+    X_energy = []
     y = []
 
     label_map = {
@@ -85,24 +111,31 @@ def preprocess_dataset():
 
         for file_path in audio_files:
             try:
-                mfcc = preprocess_file(file_path)
-                X.append(mfcc)
+                mfcc, pitch, energy = preprocess_file(file_path)
+
+                X_mfcc.append(mfcc)
+                X_pitch.append(pitch)
+                X_energy.append(energy)
                 y.append(label_value)
 
             except Exception as e:
                 print(f"Could not process {file_path.name}: {e}")
 
-    X = np.array(X, dtype=np.float32)
+    X_mfcc = np.array(X_mfcc, dtype=np.float32)
+    X_pitch = np.array(X_pitch, dtype=np.float32)
+    X_energy = np.array(X_energy, dtype=np.float32)
     y = np.array(y, dtype=np.int64)
 
-    np.save(OUTPUT_DIR / "X.npy", X)
+    np.save(OUTPUT_DIR / "X_mfcc.npy", X_mfcc)
+    np.save(OUTPUT_DIR / "X_pitch.npy", X_pitch)
+    np.save(OUTPUT_DIR / "X_energy.npy", X_energy)
     np.save(OUTPUT_DIR / "y.npy", y)
 
     print("\nPreprocessing complete.")
-    print(f"X shape: {X.shape}")
+    print(f"X_mfcc shape: {X_mfcc.shape}")
+    print(f"X_pitch shape: {X_pitch.shape}")
+    print(f"X_energy shape: {X_energy.shape}")
     print(f"y shape: {y.shape}")
-    print(f"Saved X to: {OUTPUT_DIR / 'X.npy'}")
-    print(f"Saved y to: {OUTPUT_DIR / 'y.npy'}")
 
 
 if __name__ == "__main__":
