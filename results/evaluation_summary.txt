@@ -1,0 +1,50 @@
+AMAD Model Evaluation Summary
+=============================
+
+Dataset
+-------
+Total samples: 6003
+Training samples: 4201
+Validation samples: 901
+Test samples: 901
+
+Feature shapes
+--------------
+MFCC: [6003, 40, 251]
+Pitch: [6003, 251]
+Energy: [6003, 251]
+
+Training configuration
+----------------------
+Device: mps
+Batch size: 32
+Initial learning rate: 0.001
+Maximum epochs: 30
+Best epoch: 29
+
+Test metrics
+------------
+Loss: 0.3563
+Accuracy: 0.8324 (83.24%)
+Precision: 0.8151 (81.51%)
+Recall: 0.8603 (86.03%)
+F1 score: 0.8371 (83.71%)
+
+Confusion matrix interpretation
+-------------------------------
+Real correctly classified as real: 362
+Real incorrectly classified as fake: 88
+Fake incorrectly classified as real: 63
+Fake correctly classified as fake: 388
+
+Classification report
+---------------------
+              precision    recall  f1-score   support
+
+        real       0.85      0.80      0.83       450
+        fake       0.82      0.86      0.84       451
+
+    accuracy                           0.83       901
+   macro avg       0.83      0.83      0.83       901
+weighted avg       0.83      0.83      0.83       901
+
