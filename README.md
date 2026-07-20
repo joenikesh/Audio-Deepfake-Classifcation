@@ -31,7 +31,19 @@ The local implementation is designed to run efficiently on consumer hardware usi
 
 # Dataset
 
-The local implementation was trained using a balanced dataset containing:
+The complete Audio Deepfake Detection project was developed using three complementary datasets to improve robustness, class balance, and multilingual capability.
+
+| Dataset | Description | Purpose |
+|---------|-------------|---------|
+| **WaveFake** | Contains approximately **100,000 AI-generated speech recordings** created using multiple neural speech synthesis models. | Primary source of synthetic (fake) speech samples. |
+| **Fake-or-Real (FoR)** | Contains more than **195,000 real and AI-generated speech recordings** collected from multiple speakers. | Provides a balanced mixture of authentic and synthetic speech for training and evaluation. |
+| **JSUT** | A Japanese speech corpus containing recordings from native speakers with high-quality transcriptions. | Introduced to extend the model toward multilingual deepfake detection by incorporating Japanese speech. |
+
+During development it became apparent that the WaveFake dataset contained a much larger number of synthetic samples than authentic recordings. To reduce dataset bias, a balanced subset of the available data was created by combining samples from the WaveFake, Fake-or-Real, and JSUT datasets. This balanced dataset was used for local development and experimentation, while the complete datasets were used for full-scale training on Kaggle Notebooks. :contentReference[oaicite:0]{index=0}
+
+## Local Repository Dataset
+
+The implementation in this repository uses a balanced subset consisting of:
 
 | Class | Samples |
 |------|---------:|
@@ -45,7 +57,17 @@ Every audio sample is:
 - Resampled to **16 kHz**
 - Trimmed or padded to **8 seconds**
 
----
+The extracted feature tensors have the following dimensions:
+
+```text
+MFCC   : (6003, 40, 251)
+Pitch  : (6003, 251)
+Energy : (6003, 251)
+```
+
+## Full-Scale Training
+
+The complete implementation was trained using the full curated datasets on **Kaggle Notebooks** with GPU acceleration and mixed-precision training. The training pipeline included preprocessing, feature extraction, CNN–BiLSTM model training, hyperparameter tuning, and experiment tracking to evaluate performance on the complete multilingual dataset. :contentReference[oaicite:1]{index=1}
 
 # Extracted Features
 
